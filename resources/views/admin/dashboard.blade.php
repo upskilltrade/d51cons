@@ -1,15 +1,49 @@
 @extends('admin.layout', ['title' => 'ภาพรวม'])
 
 @section('content')
-    <h1>ภาพรวม</h1>
-    <table>
-        <tr><th>ข้อความติดต่อใหม่</th><td><a href="{{ route('admin.inquiries.index', ['status' => 'new']) }}">{{ $newInquiries }}</a></td></tr>
-        <tr><th>อีเมลแจ้งเตือนส่งไม่สำเร็จ</th><td>{{ $failedMail }}</td></tr>
-        <tr><th>บริการที่เผยแพร่</th><td>{{ $publishedServices }}</td></tr>
-        <tr><th>ผลงานจริงที่เผยแพร่</th><td>{{ $publishedProjects }}</td></tr>
-        <tr><th>ภาพแนวคิดที่เผยแพร่</th><td>{{ $publishedConcepts }}</td></tr>
-    </table>
+    <div class="page-head">
+        <div>
+            <h1>ภาพรวม</h1>
+            <p>สรุปสถานะเว็บไซต์ d51cons.com</p>
+        </div>
+        <a class="btn btn--secondary" href="{{ route('home', ['locale' => config('d51.default_locale')]) }}" target="_blank" rel="noopener"><x-icon name="external" /> ดูเว็บไซต์</a>
+    </div>
 
-    <h2>ข้อความล่าสุด</h2>
-    @include('admin.inquiries.table', ['inquiries' => $latestInquiries])
+    <div class="stats">
+        <a class="card stat stat--accent" href="{{ route('admin.inquiries.index', ['status' => 'new']) }}">
+            <span class="stat__label"><x-icon name="inbox" /> ข้อความติดต่อใหม่</span>
+            <span class="stat__value">{{ $newInquiries }}</span>
+        </a>
+        <a @class(['card', 'stat', 'stat--alert' => $failedMail > 0]) href="{{ route('admin.inquiries.index') }}">
+            <span class="stat__label"><x-icon name="alert" /> อีเมลแจ้งเตือนส่งไม่สำเร็จ</span>
+            <span class="stat__value">{{ $failedMail }}</span>
+        </a>
+        <a class="card stat" href="{{ route('admin.services.index') }}">
+            <span class="stat__label"><x-icon name="layers" /> บริการที่เผยแพร่</span>
+            <span class="stat__value">{{ $publishedServices }}</span>
+        </a>
+        <a class="card stat" href="{{ route('admin.projects.index') }}">
+            <span class="stat__label"><x-icon name="image" /> ผลงานจริงที่เผยแพร่</span>
+            <span class="stat__value">{{ $publishedProjects }}</span>
+        </a>
+        <a class="card stat" href="{{ route('admin.projects.index') }}">
+            <span class="stat__label"><x-icon name="image" /> ภาพแนวคิดที่เผยแพร่</span>
+            <span class="stat__value">{{ $publishedConcepts }}</span>
+        </a>
+    </div>
+
+    @if ($publishedServices === 0)
+        <div class="flash flash--error" role="note">
+            <x-icon name="alert" />
+            <span>ยังไม่มีบริการที่เผยแพร่ เว็บไซต์จึงแสดงรายการบริการตั้งต้น 4 รายการแทน ตรวจข้อความแล้วกด “เผยแพร่” ได้ที่ <a href="{{ route('admin.services.index') }}">บริการ</a></span>
+        </div>
+    @endif
+
+    <section class="card">
+        <div class="card__head">
+            <h2>ข้อความล่าสุด</h2>
+            <a href="{{ route('admin.inquiries.index') }}">ดูทั้งหมด</a>
+        </div>
+        @include('admin.inquiries.table', ['inquiries' => $latestInquiries])
+    </section>
 @endsection
