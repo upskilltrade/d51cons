@@ -1,0 +1,25 @@
+/*
+ * Brand tokens from docs/BRAND_AND_ASSETS.md. The frontend pass builds
+ * components on top of these; keep values in sync with that document.
+ */
+:root {
+    --color-graphite: #25282a;
+    --color-warm-white: #f5f2eb;
+    --color-brick: #b65c3a;
+    --color-concrete: #a5a7a3;
+
+    --font-body: 'Noto Sans Thai', system-ui, sans-serif;
+    --font-heading-en: 'Manrope', system-ui, sans-serif;
+
+    --space: 8px;
+    --container: 1240px;
+}
+
+body {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--color-graphite);
+    background: var(--color-warm-white);
+}
