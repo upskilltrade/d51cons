@@ -2,9 +2,90 @@
 
 ## Status and constraints
 
-User confirms FTPS deployment from GitHub is available. This document specifies the deployment implementation; no active workflow or credentials are committed, and no hosting deployment has been performed. Add `.github/workflows/deploy.yml` after the Laravel scaffold, lockfiles and real hosting layout are established. Do not add a workflow that currently cannot build or that deploys a documentation-only repo.
+`.github/workflows/deploy.yml` implements this plan (manual `workflow_dispatch` only). Hosting was checked over SSH on 2026-10-25; the concrete setup for d51cons.com is in the runbook below. No production deploy has been performed yet.
 
 FTPS = FTP over TLS; it is different from SFTP/SSH. Require TLS with valid certificate and passive mode according to host configuration. Never fall back to unencrypted FTP or disable certificate verification to make deployment pass.
+
+## Runbook: d51cons.com (checked 2026-10-25)
+
+Host: DirectAdmin + CloudLinux shared hosting, PHP CLI 8.4 at `/opt/alt/php84/usr/bin/php`, MariaDB 10.4, SSH and cron available, no Composer (CI uploads `vendor/`), FTPS on port 2121. The same account hosts other sites, so every step touches only `~/domains/d51cons.com`.
+
+Layout:
+
+```
+~/domains/d51cons.com/
+├── laravel/                 # app root, uploaded by the workflow; .env, storage/ data live here
+├── public_html -> laravel/public
+├── public_html.bak-<date>/  # the old public_html, kept as a backup
+└── d51cons-app/             # unused CloudLinux Node.js placeholder (remove from the panel)
+```
+
+How a release works: the workflow tests and builds, uploads `storage/framework/down` + `maintenance.php` (site shows 503 with retry), uploads the release with SamKirkland/FTP-Deploy-Action (hash state file, only changed files, never deletes server-only files such as `.env`, logs, sessions or uploads) and a new `bootstrap/deploy-id`. Cron runs `schedule:run` every minute; `deploy:finish` sees the new id, runs `optimize:clear`, `migrate --force`, `storage:link` if missing, `optimize`, `up`, and records the id in `storage/app/deployed-id`. If a step fails the site stays in maintenance and the next minute retries; see `storage/logs/laravel.log`.
+
+### One-time setup
+
+1. Panel → Setup Node.js App: delete the `d51cons-app` application. It owns the Passenger lines in `public_html/.htaccess` and CloudLinux may rewrite that file while the app exists.
+2. Panel → MySQL Management: create a database and user for d51cons (utf8mb4).
+3. GitHub → Settings → Environments → `production`:
+   - secrets `FTPS_HOST` (hostname that matches the server's TLS certificate), `FTPS_USERNAME`, `FTPS_PASSWORD`
+   - variables `FTPS_PORT=2121`, `FTPS_APP_PATH` = path of `domains/d51cons.com/laravel/` relative to the FTPS login folder, with a trailing slash
+4. Actions → Deploy → Run workflow. The first upload sends every file and takes a while.
+5. Over SSH:
+
+   ```sh
+   cd ~/domains/d51cons.com/laravel
+   PHP=/opt/alt/php84/usr/bin/php
+   nano .env                                        # paste the values from "Server .env" below
+   $PHP artisan key:generate                        # once only, never again
+   $PHP artisan migrate --force
+   $PHP artisan storage:link
+   $PHP artisan admin:create
+   cd .. && mv public_html public_html.bak-$(date +%Y%m%d) && ln -s laravel/public public_html
+   ```
+
+6. Panel → Cron Jobs, every minute:
+
+   ```
+   /opt/alt/php84/usr/bin/php /home/intadeco/domains/d51cons.com/laravel/artisan schedule:run >> /dev/null 2>&1
+   ```
+
+7. Smoke test: `https://d51cons.com/th`, `/en`, `/admin/login`, `/sitemap.xml`; `https://d51cons.com/.env` and `/composer.json` must be 404. Submit the contact form once and check the inquiry in admin.
+
+### Server .env
+
+```
+APP_NAME="D51 Construction"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://d51cons.com
+APP_LOCALE=th
+APP_FALLBACK_LOCALE=en
+LOG_CHANNEL=daily
+LOG_LEVEL=warning
+DB_CONNECTION=mariadb
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=...
+DB_USERNAME=...
+DB_PASSWORD=...
+SESSION_DRIVER=database
+SESSION_SECURE_COOKIE=true
+CACHE_STORE=database
+QUEUE_CONNECTION=sync
+FILESYSTEM_DISK=local
+MAIL_MAILER=resend
+RESEND_API_KEY=...
+MAIL_FROM_ADDRESS=no-reply@d51cons.com
+MAIL_FROM_NAME="D51 Construction"
+INQUIRY_TO_EMAIL=...
+SITE_NOINDEX=false
+```
+
+`APP_KEY` is added by `key:generate`. Until Resend is verified for the domain, use `MAIL_MAILER=log`; inquiries are still saved and can be resent from admin later.
+
+### Rollback
+
+Re-run the Deploy workflow from the last good commit (Actions → Deploy → Run workflow → pick the branch/tag). Back up the database (panel) before releases that add migrations; migrations are written to be additive.
 
 ## Hosting preflight
 

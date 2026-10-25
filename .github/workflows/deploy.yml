@@ -1,0 +1,101 @@
+name: Deploy
+
+# Manual only until the first production deploy has been verified.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: shivammathur/setup-php@4424c9aab975b57bd706ee5a39c6b4334d6e4f60 # 2.40.0
+        with:
+          php-version: '8.4'
+          extensions: mbstring, pdo_mysql, fileinfo, gd, intl
+          coverage: none
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Test before deploying
+        run: |
+          composer install --no-interaction --prefer-dist --no-progress
+          cp .env.example .env
+          php artisan key:generate
+          php artisan test
+
+      - name: Build assets
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+
+      # Maintenance files go up first so visitors never hit half-uploaded code.
+      # deploy:finish (run by cron on the server) removes them after migrating.
+      - name: Prepare maintenance files
+        run: |
+          php artisan down --retry=60
+          mkdir -p maintenance
+          mv storage/framework/down storage/framework/maintenance.php maintenance/
+
+      - name: Build release
+        run: |
+          composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+          mkdir release
+          cp -r app artisan bootstrap composer.json composer.lock config database lang public resources routes vendor release/
+          rm -rf release/public/hot release/public/storage release/resources/css release/resources/js
+          find release/bootstrap/cache -type f ! -name .gitignore -delete
+          # Only the directory skeleton; logs, sessions and uploads stay on the server.
+          (cd storage && find . -name .gitignore ! -path './framework/testing/*' -exec install -D -m 644 {} ../release/storage/{} \;)
+          rm -f release/database/database.sqlite
+          echo "${GITHUB_SHA}" > release/bootstrap/deploy-id
+
+      - name: Enter maintenance mode
+        env:
+          FTPS_HOST: ${{ secrets.FTPS_HOST }}
+          FTPS_USERNAME: ${{ secrets.FTPS_USERNAME }}
+          FTPS_PASSWORD: ${{ secrets.FTPS_PASSWORD }}
+          FTPS_PORT: ${{ vars.FTPS_PORT }}
+          FTPS_APP_PATH: ${{ vars.FTPS_APP_PATH }}
+        run: |
+          for file in down maintenance.php; do
+            curl --fail --silent --show-error --ssl-reqd --ftp-create-dirs \
+              --user "${FTPS_USERNAME}:${FTPS_PASSWORD}" \
+              -T "maintenance/${file}" \
+              "ftp://${FTPS_HOST}:${FTPS_PORT}/${FTPS_APP_PATH}storage/framework/${file}"
+          done
+
+      - name: Upload release
+        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
+        with:
+          server: ${{ secrets.FTPS_HOST }}
+          username: ${{ secrets.FTPS_USERNAME }}
+          password: ${{ secrets.FTPS_PASSWORD }}
+          port: ${{ vars.FTPS_PORT }}
+          protocol: ftps
+          security: strict
+          local-dir: ./release/
+          server-dir: ${{ vars.FTPS_APP_PATH }}
+          # Server-only files are never in the release, so they are never touched.
+          exclude: |
+            **/.git*/**
+            .env
+            storage/app/public/**
+            storage/logs/**
+            storage/framework/**/*.php
+            bootstrap/cache/*.php
+
+      - name: Next step
+        run: echo "Uploaded ${GITHUB_SHA}. Cron runs deploy:finish within a minute to migrate and leave maintenance mode."
