@@ -77,25 +77,46 @@ jobs:
               "ftp://${FTPS_HOST}:${FTPS_PORT}/${FTPS_APP_PATH}storage/framework/${file}"
           done
 
+      - name: Install lftp
+        run: sudo apt-get update -q && sudo apt-get install -y -q lftp
+
+      # lftp sends SNI, so the host returns the d51cons.com certificate; it is verified strictly.
+      # Code directories are mirrored with --delete; vendor/ compares by size because CI file
+      # times change on every run. Server-only files (.env, storage data, caches) are never
+      # part of a mirror with --delete. deploy-id goes last so deploy:finish only starts after
+      # every file is in place.
       - name: Upload release
-        uses: SamKirkland/FTP-Deploy-Action@110f9186c050f71550953127052e77650219c287 # v4.4.0
-        with:
-          server: ${{ secrets.FTPS_HOST }}
-          username: ${{ secrets.FTPS_USERNAME }}
-          password: ${{ secrets.FTPS_PASSWORD }}
-          port: ${{ vars.FTPS_PORT || '2121' }}
-          protocol: ftps
-          security: strict
-          local-dir: ./release/
-          server-dir: ${{ vars.FTPS_APP_PATH || 'laravel/' }}
-          # Server-only files are never in the release, so they are never touched.
-          exclude: |
-            **/.git*/**
-            .env
-            storage/app/public/**
-            storage/logs/**
-            storage/framework/**/*.php
-            bootstrap/cache/*.php
+        env:
+          FTPS_HOST: ${{ secrets.FTPS_HOST }}
+          FTPS_USERNAME: ${{ secrets.FTPS_USERNAME }}
+          LFTP_PASSWORD: ${{ secrets.FTPS_PASSWORD }}
+          FTPS_PORT: ${{ vars.FTPS_PORT || '2121' }}
+          FTPS_APP_PATH: ${{ vars.FTPS_APP_PATH || 'laravel/' }}
+        run: |
+          {
+            echo "set ftp:ssl-force true"
+            echo "set ftp:ssl-protect-data true"
+            echo "set ssl:verify-certificate true"
+            echo "set ssl:check-hostname true"
+            echo "set ftp:passive-mode true"
+            echo "set net:max-retries 3"
+            echo "set net:timeout 60"
+            echo "set cmd:fail-exit true"
+            echo "open -u \"${FTPS_USERNAME}\" --env-password -p ${FTPS_PORT} ftp://${FTPS_HOST}"
+            echo "mkdir -p -f ${FTPS_APP_PATH}"
+            echo "cd ${FTPS_APP_PATH}"
+            echo "mirror -R --delete --ignore-time --no-perms --parallel=4 release/vendor vendor"
+            for dir in app config database lang resources routes public/build; do
+              echo "mirror -R --delete --no-perms --parallel=4 release/${dir} ${dir}"
+            done
+            echo "mirror -R --no-perms --exclude-glob cache/*.php --exclude-glob deploy-id release/bootstrap bootstrap"
+            echo "mirror -R --no-perms release/storage storage"
+            echo "mirror -R --no-perms --exclude build/ --exclude storage release/public public"
+            echo "put -O . release/artisan release/composer.json release/composer.lock"
+            echo "put -O bootstrap release/bootstrap/deploy-id"
+            echo "bye"
+          } > upload.lftp
+          lftp -f upload.lftp
 
       - name: Next step
         run: echo "Uploaded ${GITHUB_SHA}. Cron runs deploy:finish within a minute to migrate and leave maintenance mode."

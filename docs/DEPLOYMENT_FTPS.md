@@ -20,7 +20,7 @@ Layout:
 └── d51cons-app/             # unused CloudLinux Node.js placeholder (remove from the panel)
 ```
 
-How a release works: the workflow tests and builds, uploads `storage/framework/down` + `maintenance.php` (site shows 503 with retry), uploads the release with SamKirkland/FTP-Deploy-Action (hash state file, only changed files, never deletes server-only files such as `.env`, logs, sessions or uploads) and a new `bootstrap/deploy-id`. Cron runs `schedule:run` every minute; `deploy:finish` sees the new id, runs `optimize:clear`, `migrate --force`, `storage:link` if missing, `optimize`, `up`, and records the id in `storage/app/deployed-id`. If a step fails the site stays in maintenance and the next minute retries; see `storage/logs/laravel.log`.
+How a release works: the workflow tests and builds, uploads `storage/framework/down` + `maintenance.php` (site shows 503 with retry), uploads the release with lftp (SNI + strict certificate check; the host returns an expired default certificate without SNI), mirroring code directories with delete while never touching server-only files such as `.env`, logs, sessions or uploads, and uploads a new `bootstrap/deploy-id` last. Cron runs `schedule:run` every minute; `deploy:finish` sees the new id, runs `optimize:clear`, `migrate --force`, `storage:link` if missing, `optimize`, `up`, and records the id in `storage/app/deployed-id`. If a step fails the site stays in maintenance and the next minute retries; see `storage/logs/laravel.log`.
 
 ### One-time setup
 
