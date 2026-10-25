@@ -13,11 +13,12 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      mysql:
-        image: mysql:8.4
+      # Same engine and version as the production host.
+      mariadb:
+        image: mariadb:10.4
         env:
-          MYSQL_DATABASE: d51cons_test
-          MYSQL_ROOT_PASSWORD: password
+          MARIADB_DATABASE: d51cons_test
+          MARIADB_ROOT_PASSWORD: password
         ports:
           - 3306:3306
         options: >-
@@ -25,7 +26,7 @@ jobs:
           --health-interval=10s --health-timeout=5s --health-retries=5
 
     env:
-      DB_CONNECTION: mysql
+      DB_CONNECTION: mariadb
       DB_HOST: 127.0.0.1
       DB_PORT: 3306
       DB_DATABASE: d51cons_test
@@ -69,6 +70,6 @@ jobs:
       - name: Build assets
         run: npm run build
 
-      # phpunit.xml defaults to sqlite in memory; the env above runs the suite on MySQL like production.
+      # phpunit.xml defaults to sqlite in memory; the env above runs the suite on MariaDB like production.
       - name: Tests
         run: php artisan test

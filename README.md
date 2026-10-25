@@ -18,7 +18,7 @@ Stack: PHP + Laravel + MySQL; Blade SSR, Vite, CSS และ JavaScript เท�
 
 ## Backend
 
-Laravel 13 + MySQL, PHP 8.3 ขึ้นไป (hosting จริงเป็น PHP 8.4 และ CI ทดสอบบน 8.4)
+Laravel 13 + MariaDB/MySQL, PHP 8.3 ขึ้นไป (hosting จริงเป็น PHP 8.4 + MariaDB 10.4 และ CI ทดสอบบนเวอร์ชันเดียวกัน)
 
 ### ติดตั้งบนเครื่องพัฒนา
 
@@ -47,7 +47,7 @@ php artisan serve                # เว็บที่ /th, /en และห�
 
 ### ค่าบน server (.env)
 
-`MAIL_MAILER=resend`, `RESEND_API_KEY`, `MAIL_FROM_ADDRESS` (domain ที่ verify กับ Resend แล้ว), `MAIL_FROM_NAME`, `INQUIRY_TO_EMAIL`, ค่า `DB_*` ของ MySQL, `SESSION_SECURE_COOKIE=true` ดูขั้นตอน deploy ที่ [DEPLOYMENT_FTPS.md](docs/DEPLOYMENT_FTPS.md)
+`MAIL_MAILER=resend`, `RESEND_API_KEY`, `MAIL_FROM_ADDRESS` (domain ที่ verify กับ Resend แล้ว), `MAIL_FROM_NAME`, `INQUIRY_TO_EMAIL`, `DB_CONNECTION=mariadb` และค่า `DB_*`, `SESSION_SECURE_COOKIE=true` ดูขั้นตอน deploy ที่ [DEPLOYMENT_FTPS.md](docs/DEPLOYMENT_FTPS.md)
 
 ### สำหรับงาน frontend
 
