@@ -1,9 +1,9 @@
 @php
     $locale = app()->getLocale();
     $settings = \App\Models\Setting::allValues();
-    $siteName = \App\Models\Setting::localized('seo_title') ?: config('app.name');
+    $siteName = \App\Models\Setting::localized('seo_title') ?: __('site.seo.title');
     $title = trim(($title ?? '') . ' | ' . $siteName, ' |');
-    $description = $description ?? \App\Models\Setting::localized('seo_description');
+    $description = ($description ?? null) ?: (\App\Models\Setting::localized('seo_description') ?: __('site.seo.description'));
     $route = request()->route();
     $routeName = $route?->getName();
     $alternates = collect(config('d51.locales'))->mapWithKeys(fn ($l) => [
@@ -45,7 +45,28 @@
         <meta property="og:description" content="{{ $description }}">
     @endif
     <meta property="og:url" content="{{ $alternates[$locale] }}">
-    <meta property="og:image" content="{{ asset('images/concepts/hero-pool-villa-1280.webp') }}">
+    <meta property="og:image" content="{{ asset('images/og-image.jpg') }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="48x48">
+    <link rel="icon" href="{{ asset('icon-192.png') }}" type="image/png" sizes="192x192">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}">
+    {{-- Organization data uses only values the owner has entered in admin. --}}
+    <script type="application/ld+json">{!! json_encode(array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'GeneralContractor',
+        'name' => 'D51 Construction',
+        'alternateName' => $legalName ?: 'ดีไฟว์วัน คอนสตรัคชั่น',
+        'url' => url('/'),
+        'logo' => asset('icon-512.png'),
+        'image' => asset('images/og-image.jpg'),
+        'telephone' => $settings['phone'],
+        'email' => $settings['email'],
+        'address' => $address,
+        'areaServed' => \App\Models\Setting::localized('service_area'),
+        'sameAs' => array_values(array_filter([$settings['facebook_url'], $settings['instagram_url'], $settings['line_url']])) ?: null,
+    ]), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
     <meta property="og:locale" content="{{ $locale === 'th' ? 'th_TH' : 'en_US' }}">
     <script>document.documentElement.classList.add('js')</script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])

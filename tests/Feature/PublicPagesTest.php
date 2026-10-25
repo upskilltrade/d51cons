@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Project;
 use App\Models\Service;
+use App\Models\Setting;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -30,7 +31,7 @@ class PublicPagesTest extends TestCase
 
     public function test_unknown_locale_is_not_found(): void
     {
-        $this->get('/fr')->assertNotFound();
+        $this->get('/fr')->assertNotFound()->assertSee('ไม่พบหน้าที่คุณต้องการ');
         $this->get('/fr/services')->assertNotFound();
     }
 
@@ -110,5 +111,17 @@ class PublicPagesTest extends TestCase
 
         config(['d51.noindex' => true]);
         $this->get('/th')->assertHeader('X-Robots-Tag', 'noindex, nofollow');
+    }
+
+    public function test_head_has_share_image_and_only_filled_organization_data(): void
+    {
+        $this->get('/th')
+            ->assertSee('images/og-image.jpg', false)
+            ->assertSee('"@type":"GeneralContractor"', false)
+            ->assertDontSee('"telephone"', false);
+
+        Setting::saveMany(['phone' => '021234567']);
+
+        $this->get('/th')->assertSee('"telephone":"021234567"', false);
     }
 }

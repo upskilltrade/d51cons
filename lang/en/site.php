@@ -4,6 +4,11 @@ return [
     'concept_label' => 'Illustrative concept',
     'concept_note' => 'Images on this site are currently illustrative concepts, not completed company projects.',
 
+    'seo' => [
+        'title' => 'D51 Construction | Homes, Pool Villas & Commercial Builds',
+        'description' => 'D51 Construction builds modern homes, pool villas and commercial spaces and handles renovation, with clear planning, careful execution and regular progress updates.',
+    ],
+
     'brand' => [
         'name' => 'D51 Construction',
         'name_local' => 'D51 Construction',

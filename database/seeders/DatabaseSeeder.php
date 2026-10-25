@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
     /**
      * Starter content. Safe to run more than once.
      *
-     * Services start as drafts until the owner confirms them. Concept projects
+     * The owner confirmed the four services on 2026-10-25, so they start published. Concept projects
      * use the AI-generated images and are always flagged is_concept.
      * No admin account is seeded: use `php artisan admin:create`.
      */
@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
                 'summary_en' => $summaryEn,
                 'image_path' => $image,
                 'sort_order' => $order + 1,
-                'is_published' => false,
+                'is_published' => true,
             ]);
         }
 

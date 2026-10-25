@@ -1,0 +1,6 @@
+@extends('errors.layout')
+@section('code', '429')
+@section('title_th', 'ส่งคำขอถี่เกินไป')
+@section('text_th', 'กรุณารอสักครู่แล้วลองใหม่อีกครั้ง')
+@section('text_en', 'Too many requests. Please wait a moment and try again.')
+@section('link', 'กลับหน้าแรก / Home')

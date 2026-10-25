@@ -1,0 +1,6 @@
+@extends('errors.layout')
+@section('code', '500')
+@section('title_th', 'ระบบขัดข้องชั่วคราว')
+@section('text_th', 'ขออภัยในความไม่สะดวก กรุณาลองใหม่อีกครั้งในอีกสักครู่')
+@section('text_en', 'Something went wrong on our side. Please try again shortly.')
+@section('link', 'กลับหน้าแรก / Home')
