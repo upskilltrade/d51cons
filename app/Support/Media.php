@@ -26,6 +26,24 @@ class Media
     }
 
     /**
+     * Responsive srcset for bundled images that ship with -768/-1280 variants
+     * next to the 1536px source. Uploads have no variants and return null.
+     */
+    public static function srcset(?string $path): ?string
+    {
+        if (blank($path) || ! Str::startsWith($path, 'images/') || ! Str::endsWith($path, '.webp')) {
+            return null;
+        }
+
+        $base = Str::beforeLast($path, '.webp');
+        $sources = collect([768, 1280])
+            ->filter(fn (int $width) => is_file(public_path("{$base}-{$width}.webp")))
+            ->map(fn (int $width) => asset("{$base}-{$width}.webp")." {$width}w");
+
+        return $sources->isEmpty() ? null : $sources->push(asset($path).' 1536w')->implode(', ');
+    }
+
+    /**
      * Store an already validated image under a random name.
      */
     public static function store(UploadedFile $file, string $directory): string

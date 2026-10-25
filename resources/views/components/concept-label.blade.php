@@ -1,1 +1,1 @@
-<span class="concept-label">{{ __('site.concept_label') }}</span>
+<span {{ $attributes->class('concept-label') }}>{{ __('site.concept_label') }}</span>
