@@ -20,7 +20,7 @@ Layout:
 └── d51cons-app/             # unused CloudLinux Node.js placeholder (remove from the panel)
 ```
 
-How a release works: the workflow tests and builds, uploads `storage/framework/down` + `maintenance.php` (site shows 503 with retry), uploads the release with SamKirkland/FTP-Deploy-Action (hash state file, only changed files, never deletes server-only files such as `.env`, logs, sessions or uploads) and a new `bootstrap/deploy-id`. Cron runs `schedule:run` every minute; `deploy:finish` sees the new id, runs `optimize:clear`, `migrate --force`, `storage:link` if missing, `optimize`, `up`, and records the id in `storage/app/deployed-id`. If a step fails the site stays in maintenance and the next minute retries; see `storage/logs/laravel.log`.
+How a release works: the workflow tests and builds, uploads `storage/framework/down` + `maintenance.php` (site shows 503 with retry), uploads the release with lftp (SNI + strict certificate check; the host returns an expired default certificate without SNI), mirroring code directories with delete while never touching server-only files such as `.env`, logs, sessions or uploads, and uploads a new `bootstrap/deploy-id` last. Cron runs `schedule:run` every minute; `deploy:finish` sees the new id, runs `optimize:clear`, `migrate --force`, `storage:link` if missing, `optimize`, `up`, and records the id in `storage/app/deployed-id`. If a step fails the site stays in maintenance and the next minute retries; see `storage/logs/laravel.log`.
 
 ### One-time setup
 
@@ -28,22 +28,15 @@ How a release works: the workflow tests and builds, uploads `storage/framework/d
 2. Panel → MySQL Management: create a database and user for d51cons (utf8mb4).
 3. GitHub → Settings → Environments → `production`:
    - secrets `FTPS_HOST` (hostname that matches the server's TLS certificate), `FTPS_USERNAME`, `FTPS_PASSWORD`
-   - variables `FTPS_PORT=2121`, `FTPS_APP_PATH` = path of `domains/d51cons.com/laravel/` relative to the FTPS login folder, with a trailing slash
+   - optional variables `FTPS_PORT` (default `2121`) and `FTPS_APP_PATH` (default `laravel/`, relative to the FTPS login folder `~/domains/d51cons.com`, with a trailing slash)
 4. Actions → Deploy → Run workflow. The first upload sends every file and takes a while.
-5. Over SSH:
+5. Over SSH, run the one-time setup script. It asks for the DB name/user/password and the inquiry inbox, writes `.env` (mode 600), generates `APP_KEY`, migrates and seeds, links storage, creates the admin account, moves the old `public_html` to a dated backup and links `public_html -> laravel/public`, adds the cron line and finishes the deploy. Re-running it is safe.
 
    ```sh
-   cd ~/domains/d51cons.com/laravel
-   PHP=/opt/alt/php84/usr/bin/php
-   nano .env                                        # paste the values from "Server .env" below
-   $PHP artisan key:generate                        # once only, never again
-   $PHP artisan migrate --force
-   $PHP artisan storage:link
-   $PHP artisan admin:create
-   cd .. && mv public_html public_html.bak-$(date +%Y%m%d) && ln -s laravel/public public_html
+   bash <(curl -fsSL https://raw.githubusercontent.com/upskilltrade/d51cons/main/scripts/server-setup.sh)
    ```
 
-6. Panel → Cron Jobs, every minute:
+6. If the script could not add the cron job, add it in Panel → Cron Jobs, every minute:
 
    ```
    /opt/alt/php84/usr/bin/php /home/intadeco/domains/d51cons.com/laravel/artisan schedule:run >> /dev/null 2>&1
