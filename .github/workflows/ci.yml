@@ -12,19 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      # Same engine and version as the production host.
-      mariadb:
-        image: mariadb:10.4
-        env:
-          MARIADB_DATABASE: d51cons_test
-          MARIADB_ROOT_PASSWORD: password
-        ports:
-          - 3306:3306
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -ppassword"
-          --health-interval=10s --health-timeout=5s --health-retries=5
-
     env:
       DB_CONNECTION: mariadb
       DB_HOST: 127.0.0.1
@@ -47,6 +34,19 @@ jobs:
         with:
           node-version: 22
           cache: npm
+
+      # Same version and default storage engine (MyISAM) as the production host.
+      - name: Start MariaDB
+        run: |
+          docker run -d --name mariadb -p 3306:3306 \
+            -e MARIADB_DATABASE=d51cons_test -e MARIADB_ROOT_PASSWORD=password \
+            mariadb:10.4 --default-storage-engine=MyISAM
+          for i in $(seq 1 30); do
+            docker exec mariadb mysqladmin ping -h 127.0.0.1 -ppassword --silent && exit 0
+            sleep 2
+          done
+          docker logs mariadb
+          exit 1
 
       - name: Install PHP dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
