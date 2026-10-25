@@ -67,8 +67,8 @@ jobs:
           FTPS_HOST: ${{ secrets.FTPS_HOST }}
           FTPS_USERNAME: ${{ secrets.FTPS_USERNAME }}
           FTPS_PASSWORD: ${{ secrets.FTPS_PASSWORD }}
-          FTPS_PORT: ${{ vars.FTPS_PORT }}
-          FTPS_APP_PATH: ${{ vars.FTPS_APP_PATH }}
+          FTPS_PORT: ${{ vars.FTPS_PORT || '2121' }}
+          FTPS_APP_PATH: ${{ vars.FTPS_APP_PATH || 'laravel/' }}
         run: |
           for file in down maintenance.php; do
             curl --fail --silent --show-error --ssl-reqd --ftp-create-dirs \
@@ -83,11 +83,11 @@ jobs:
           server: ${{ secrets.FTPS_HOST }}
           username: ${{ secrets.FTPS_USERNAME }}
           password: ${{ secrets.FTPS_PASSWORD }}
-          port: ${{ vars.FTPS_PORT }}
+          port: ${{ vars.FTPS_PORT || '2121' }}
           protocol: ftps
           security: strict
           local-dir: ./release/
-          server-dir: ${{ vars.FTPS_APP_PATH }}
+          server-dir: ${{ vars.FTPS_APP_PATH || 'laravel/' }}
           # Server-only files are never in the release, so they are never touched.
           exclude: |
             **/.git*/**

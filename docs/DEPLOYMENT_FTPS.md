@@ -28,7 +28,7 @@ How a release works: the workflow tests and builds, uploads `storage/framework/d
 2. Panel → MySQL Management: create a database and user for d51cons (utf8mb4).
 3. GitHub → Settings → Environments → `production`:
    - secrets `FTPS_HOST` (hostname that matches the server's TLS certificate), `FTPS_USERNAME`, `FTPS_PASSWORD`
-   - variables `FTPS_PORT=2121`, `FTPS_APP_PATH` = path of `domains/d51cons.com/laravel/` relative to the FTPS login folder, with a trailing slash
+   - optional variables `FTPS_PORT` (default `2121`) and `FTPS_APP_PATH` (default `laravel/`, relative to the FTPS login folder `~/domains/d51cons.com`, with a trailing slash)
 4. Actions → Deploy → Run workflow. The first upload sends every file and takes a while.
 5. Over SSH:
 
