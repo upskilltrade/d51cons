@@ -1,0 +1,6 @@
+@extends('errors.layout')
+@section('code', '404')
+@section('title_th', 'ไม่พบหน้าที่คุณต้องการ')
+@section('text_th', 'หน้านี้อาจถูกย้ายหรือไม่มีอยู่แล้ว ลองเริ่มจากหน้าแรกของเรา')
+@section('text_en', 'Page not found. It may have moved or no longer exists.')
+@section('link', 'กลับหน้าแรก / Home')

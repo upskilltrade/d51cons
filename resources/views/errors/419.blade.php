@@ -1,0 +1,6 @@
+@extends('errors.layout')
+@section('code', '419')
+@section('title_th', 'หน้านี้หมดอายุแล้ว')
+@section('text_th', 'กรุณากลับไปโหลดหน้าใหม่แล้วส่งข้อมูลอีกครั้ง')
+@section('text_en', 'This page expired. Please reload it and submit again.')
+@section('link', 'กลับหน้าแรก / Home')

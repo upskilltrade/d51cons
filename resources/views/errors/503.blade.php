@@ -1,0 +1,5 @@
+@extends('errors.layout')
+@section('code', '503')
+@section('title_th', 'กำลังปรับปรุงเว็บไซต์')
+@section('text_th', 'เว็บไซต์จะกลับมาให้บริการในอีกไม่กี่นาที')
+@section('text_en', 'We are updating the website and will be back in a few minutes.')
