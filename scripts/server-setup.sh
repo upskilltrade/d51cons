@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # One-time server setup for d51cons.com. Run over SSH after the first Deploy upload:
-#   bash <(curl -fsSL https://raw.githubusercontent.com/upskilltrade/d51cons/main/scripts/server-setup.sh)
+#   curl -fsSL -o ~/d51-setup.sh https://raw.githubusercontent.com/upskilltrade/d51cons/main/scripts/server-setup.sh && bash ~/d51-setup.sh
+# (CageFS has no /dev/fd, so bash <(curl ...) does not work on this host.)
 # Safe to run again: it keeps an existing .env, APP_KEY, public_html symlink and cron line.
 set -euo pipefail
 

@@ -33,7 +33,7 @@ How a release works: the workflow tests and builds, uploads `storage/framework/d
 5. Over SSH, run the one-time setup script. It asks for the DB name/user/password and the inquiry inbox, writes `.env` (mode 600), generates `APP_KEY`, migrates and seeds, links storage, creates the admin account, moves the old `public_html` to a dated backup and links `public_html -> laravel/public`, adds the cron line and finishes the deploy. Re-running it is safe.
 
    ```sh
-   bash <(curl -fsSL https://raw.githubusercontent.com/upskilltrade/d51cons/main/scripts/server-setup.sh)
+   curl -fsSL -o ~/d51-setup.sh https://raw.githubusercontent.com/upskilltrade/d51cons/main/scripts/server-setup.sh && bash ~/d51-setup.sh
    ```
 
 6. If the script could not add the cron job, add it in Panel → Cron Jobs, every minute:
