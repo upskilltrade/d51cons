@@ -11,7 +11,10 @@ class ProjectController extends Controller
 {
     public function index(Request $request): View
     {
-        $categories = Service::query()->published()->ordered()->get();
+        // Only service types that have real projects to show become filters.
+        $categories = Service::query()->published()
+            ->whereHas('projects', fn ($query) => $query->published()->actual())
+            ->ordered()->get();
         $category = $categories->firstWhere('slug', $request->query('category'));
 
         $projects = Project::query()
