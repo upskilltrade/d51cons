@@ -11,7 +11,8 @@
 @endphp
 
 @section('content')
-    <x-page-hero :eyebrow="__('site.contact.eyebrow')" :title="__('site.contact.heading')" :lead="__('site.contact.lead')" />
+    <x-page-hero :eyebrow="__('site.contact.eyebrow')" :title="__('site.contact.heading')" :lead="__('site.contact.lead')"
+        image="images/concepts/detail-materials.webp" concept />
 
     <section class="section">
         <div class="container contact-layout">

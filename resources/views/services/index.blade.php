@@ -2,11 +2,12 @@
 
 @section('content')
     @php
-        $fallbackImages = ['images/concepts/hero-pool-villa.webp', 'images/concepts/hero-pool-villa.webp', 'images/concepts/commercial-building.webp', 'images/concepts/construction-quality.webp'];
+        $fallbackImages = ['images/concepts/service-custom-home.webp', 'images/concepts/service-pool-villa.webp', 'images/concepts/commercial-building.webp', 'images/concepts/service-renovation.webp'];
         $items = $services->isNotEmpty() ? $services : collect(__('site.default_services'));
     @endphp
 
-    <x-page-hero :eyebrow="__('site.services.eyebrow')" :title="__('site.services.heading')" :lead="__('site.services.lead')" />
+    <x-page-hero :eyebrow="__('site.services.eyebrow')" :title="__('site.services.heading')" :lead="__('site.services.lead')"
+        image="images/concepts/detail-materials.webp" concept />
 
     <section class="section">
         <div class="container service-list">
@@ -20,8 +21,7 @@
                 @endphp
                 <article class="service-row reveal">
                     <a class="service-row__media" href="{{ $href }}" tabindex="-1" aria-hidden="true">
-                        <x-img :path="$image" alt="" sizes="(min-width: 900px) 55vw, 100vw"
-                            :style="$loop->index === 0 ? 'object-position: 18% 50%' : null" />
+                        <x-img :path="$image" alt="" sizes="(min-width: 900px) 55vw, 100vw" />
                         @if (\Illuminate\Support\Str::startsWith($image, 'images/concepts/'))
                             <x-concept-label class="concept-label--corner" />
                         @endif

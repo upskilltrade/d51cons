@@ -19,10 +19,10 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $services = [
-            ['homes', 'บ้านพักอาศัย', 'Custom Homes', 'บ้านโมเดิร์นที่ใช้งานได้จริง ออกแบบตามไลฟ์สไตล์ของคุณ', 'Modern, functional homes built around your lifestyle.', null],
-            ['pool-villas', 'พูลวิลล่า', 'Pool Villas', 'พื้นที่พักอาศัยพร้อมสระว่ายน้ำ สำหรับชีวิตในเขตร้อน', 'Living spaces with pools, designed for tropical life.', 'images/concepts/hero-pool-villa.webp'],
+            ['homes', 'บ้านพักอาศัย', 'Custom Homes', 'บ้านโมเดิร์นที่ใช้งานได้จริง ออกแบบตามไลฟ์สไตล์ของคุณ', 'Modern, functional homes built around your lifestyle.', 'images/concepts/service-custom-home.webp'],
+            ['pool-villas', 'พูลวิลล่า', 'Pool Villas', 'พื้นที่พักอาศัยพร้อมสระว่ายน้ำ สำหรับชีวิตในเขตร้อน', 'Living spaces with pools, designed for tropical life.', 'images/concepts/service-pool-villa.webp'],
             ['commercial', 'อาคารพาณิชย์', 'Commercial Spaces', 'อาคารสำหรับธุรกิจที่ใช้งานได้ดีและมีมูลค่าระยะยาว', 'Professional spaces for business and long-term value.', 'images/concepts/commercial-building.webp'],
-            ['renovation', 'รีโนเวตและตกแต่ง', 'Renovation & Fit-out', 'ปรับปรุงและยกระดับพื้นที่เดิมอย่างประณีต', 'Transform and upgrade existing spaces with precision.', null],
+            ['renovation', 'รีโนเวตและตกแต่ง', 'Renovation & Fit-out', 'ปรับปรุงและยกระดับพื้นที่เดิมอย่างประณีต', 'Transform and upgrade existing spaces with precision.', 'images/concepts/service-renovation.webp'],
         ];
 
         foreach ($services as $order => [$slug, $th, $en, $summaryTh, $summaryEn, $image]) {
@@ -39,7 +39,9 @@ class DatabaseSeeder extends Seeder
 
         $concepts = [
             ['concept-modern-pool-villa', 'pool-villas', 'พูลวิลล่าโมเดิร์นทรอปิคอล', 'Modern Tropical Pool Villa', 'images/concepts/hero-pool-villa.webp'],
+            ['concept-modern-tropical-home', 'homes', 'บ้านโมเดิร์นระแนงไม้สัก', 'Modern Home with Teak Screens', 'images/concepts/service-custom-home.webp'],
             ['concept-commercial-building', 'commercial', 'อาคารพาณิชย์ร่วมสมัย', 'Contemporary Commercial Building', 'images/concepts/commercial-building.webp'],
+            ['concept-tropical-living-renovation', 'renovation', 'ห้องนั่งเล่นรีโนเวตสไตล์ทรอปิคอล', 'Tropical Living Room Renovation', 'images/concepts/service-renovation.webp'],
             ['concept-quality-inspection', null, 'การตรวจวัดคุณภาพงานก่อสร้าง', 'Construction Quality Inspection', 'images/concepts/construction-quality.webp'],
         ];
 

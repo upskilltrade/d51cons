@@ -4,10 +4,10 @@
 --}}
 @php
     $fallbackImages = [
-        'images/concepts/hero-pool-villa.webp',
-        'images/concepts/hero-pool-villa.webp',
+        'images/concepts/service-custom-home.webp',
+        'images/concepts/service-pool-villa.webp',
         'images/concepts/commercial-building.webp',
-        'images/concepts/construction-quality.webp',
+        'images/concepts/service-renovation.webp',
     ];
     $items = $services->isNotEmpty() ? $services : collect(__('site.default_services'));
 @endphp

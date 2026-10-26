@@ -2,7 +2,7 @@
 
 @section('content')
     <x-page-hero :eyebrow="__('site.about.eyebrow')" :title="__('site.about.heading')" :lead="__('site.about.lead')"
-        image="images/concepts/commercial-building.webp" concept />
+        image="images/concepts/about-planning.webp" concept />
 
     @if ($about = \App\Models\Setting::localized('about'))
         <section class="section section--paper">

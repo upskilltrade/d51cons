@@ -890,14 +890,6 @@ p {
     transform: scale(1.05);
 }
 
-.service-card:nth-child(4n + 1) .service-card__media img {
-    object-position: 18% 50%;
-}
-
-.service-card:nth-child(4n + 2) .service-card__media img {
-    object-position: 75% 50%;
-}
-
 .service-card__body {
     display: flex;
     flex-direction: column;
