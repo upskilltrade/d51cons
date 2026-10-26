@@ -1,7 +1,8 @@
 @extends('layouts.site', ['title' => __('site.projects.title')])
 
 @section('content')
-    <x-page-hero :eyebrow="__('site.projects.eyebrow')" :title="__('site.projects.heading')" :lead="__('site.projects.lead')" />
+    <x-page-hero :eyebrow="__('site.projects.eyebrow')" :title="__('site.projects.heading')" :lead="__('site.projects.lead')"
+        image="images/concepts/detail-materials.webp" concept />
 
     <section class="section">
         <div class="container">

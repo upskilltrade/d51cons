@@ -1,7 +1,8 @@
 @extends('layouts.site', ['title' => __('site.privacy.title')])
 
 @section('content')
-    <x-page-hero :eyebrow="__('site.privacy.eyebrow')" :title="__('site.privacy.title')" />
+    <x-page-hero :eyebrow="__('site.privacy.eyebrow')" :title="__('site.privacy.title')"
+        image="images/concepts/detail-materials.webp" concept />
 
     <section class="section">
         <div class="container legal">
