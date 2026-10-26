@@ -6,14 +6,14 @@ return [
 
     'seo' => [
         'title' => 'D51 Construction | Homes, Pool Villas & Commercial Builds',
-        'description' => 'D51 Construction builds modern homes, pool villas and commercial spaces and handles renovation, with clear planning, careful execution and regular progress updates.',
+        'description' => 'D51 Construction builds modern homes, pool villas, commercial buildings and warehouses, handles renovation and civil works such as roads, concrete yards and drainage, with clear planning, careful execution and regular progress updates.',
     ],
 
     'brand' => [
         'name' => 'D51 Construction',
         'name_local' => 'D51 Construction',
         'tagline' => 'Built with precision',
-        'scope' => 'Homes · Pool villas · Commercial · Renovation',
+        'scope' => 'Homes · Pool villas · Commercial · Warehouses · Civil works',
     ],
 
     'nav' => [
@@ -81,7 +81,7 @@ return [
     ],
 
     'footer' => [
-        'about' => 'Construction for homes, pool villas, commercial buildings and renovation, guided by Modern Precision: solid, refined and systematic.',
+        'about' => 'Construction for homes, pool villas, commercial buildings, warehouses, renovation and civil works, guided by Modern Precision: solid, refined and systematic.',
         'explore' => 'Explore',
         'contact' => 'Contact',
         'contact_form' => 'Send your project details',
@@ -98,7 +98,10 @@ return [
     'services' => [
         'title' => 'Services',
         'eyebrow' => 'Our services',
-        'heading' => 'Construction from private homes to commercial buildings',
+        'heading' => 'Construction from private homes to civil works',
+        'more_eyebrow' => 'Civil & large-scale works',
+        'more_title' => 'More services',
+        'more_text' => 'Estates, industrial buildings and infrastructure, from site preparation to roads and sports courts.',
         'lead' => 'Every project starts with understanding your needs and agreeing a clear scope, then building it with care.',
         'more' => 'Details',
         'consult' => 'Discuss this service',
